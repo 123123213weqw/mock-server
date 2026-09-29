@@ -10,6 +10,8 @@ import (
 	"llm-mock-server/pkg/middleware"
 	"llm-mock-server/pkg/provider/chat"
 	"llm-mock-server/pkg/provider/embeddings"
+	"llm-mock-server/pkg/provider/rerank"
+	"llm-mock-server/pkg/provider/responses"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
@@ -47,6 +49,13 @@ func Run(option *options.Option) error {
 	server.POST("/v1/embeddings", embeddings.HandleEmbeddings)
 	// baidu (v2 API)
 	server.POST("/v2/embeddings", embeddings.HandleEmbeddings)
+
+	// rerank (cohere v1)
+	server.POST("/v1/rerank", rerank.HandleRerank)
+
+	// responses API (openai and groq, which serves it under /openai/v1)
+	server.POST("/v1/responses", responses.HandleResponses)
+	server.POST("/openai/v1/responses", responses.HandleResponses)
 
 	log.Infof("Starting server on port %d", option.ServerPort)
 	return server.Run(fmt.Sprintf(":%d", option.ServerPort))
